@@ -11,12 +11,12 @@ namespace SWGEmuStructureBuilder::Tre {
             TreRecord record;
             std::streampos pos = stream.tellg();
             
-            Private::ReadLittleEndian(stream, record.checksum);
-            Private::ReadLittleEndian(stream, record.dataUncompressed);
-            Private::ReadLittleEndian(stream, record.dataOffset);
-            Private::ReadLittleEndian<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, record.dataCompression);
-            Private::ReadLittleEndian(stream, record.dataCompressed);
-            Private::ReadLittleEndian(stream, record.nameOffset);
+            Private::Read(stream, record.checksum);
+            Private::Read(stream, record.dataUncompressed);
+            Private::Read(stream, record.dataOffset);
+            Private::Read<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, record.dataCompression);
+            Private::Read(stream, record.dataCompressed);
+            Private::Read(stream, record.nameOffset);
 
             assert(stream.tellg() - pos == 24);
 

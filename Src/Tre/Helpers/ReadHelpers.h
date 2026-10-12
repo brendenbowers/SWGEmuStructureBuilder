@@ -6,44 +6,53 @@
 #include <filesystem>
 #include <vector>
 #include <streambuf>
+#include <algorithm>
 
 namespace SWGEmuStructureBuilder::Tre::Private
 {
     bool CompareVecToString(const std::vector<char>& vec, const std::string_view str);
     bool CompareVecToChars(const std::vector<char>& vec, std::initializer_list<char> chars);
 
-    template<typename T, std::size_t SIZE = sizeof(T)>
-    T ReadLittleEndian(std::istream& stream)
-    {
-        T value;
-        ReadLittleEndian(stream, value);
-        return value;
-    }
-
-    template<typename T, std::size_t SIZE = sizeof(T)>
-    void ReadLittleEndian(std::istream& stream, T& value)
+    template<typename T, std::size_t SIZE = sizeof(T), bool BE = false>
+    void Read(std::istream& stream, T& value)
     {
         uint8_t buffer[SIZE];
         stream.read(reinterpret_cast<char*>(buffer), SIZE);
-        if(stream.gcount() != SIZE) {
-            throw std::ios_base::failure("Failed to read from stream");
-        }
+        assert(stream.gcount() == SIZE);
 
-        std::memcpy(&value, buffer, SIZE);
+        if constexpr (!BE)
+        {
+            std::memcpy(&value, buffer, SIZE);
+        }
+        else
+        {
+            std::reverse_copy(
+                buffer,
+                buffer + SIZE,
+                reinterpret_cast<unsigned char*>(&value));
+        }
     }
 
-    template<typename TEnum, typename TStorage, std::size_t SIZE = sizeof(TStorage)>
-    void ReadLittleEndian(std::istream& stream, TEnum& value)
+    template<typename T, std::size_t SIZE = sizeof(T), bool BE = false>
+    T Read(std::istream& stream)
+    {
+        T value;
+        Read<T,SIZE,BE>(stream, value);
+        return value;
+    }
+
+    template<typename TEnum, typename TStorage, std::size_t SIZE = sizeof(TStorage), bool BE = false>
+    void Read(std::istream& stream, TEnum& value)
     {
         TStorage storageValue;
-        ReadLittleEndian<TStorage, SIZE>(stream, storageValue);
+        Read<TStorage, SIZE, BE>(stream, storageValue);
         value = static_cast<TEnum>(storageValue);
     }
 
-    template<typename TEnum, typename TStorage, std::size_t SIZE = sizeof(TStorage)>
-    TEnum ReadLittleEndian(std::istream& stream)
+    template<typename TEnum, typename TStorage, std::size_t SIZE = sizeof(TStorage), bool BE = false>
+    TEnum Read(std::istream& stream)
     {
-        TStorage storageValue = ReadLittleEndian<TStorage, SIZE>(stream);
+        TStorage storageValue = Read<TStorage, SIZE, BE>(stream);
         return static_cast<TEnum>(storageValue);
     }
 }

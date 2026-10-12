@@ -30,14 +30,14 @@ namespace SWGEmuStructureBuilder::Tre
             }
 
             TreHeader header;
-            Private::ReadLittleEndian(stream, header.version);
-            Private::ReadLittleEndian(stream, header.fileCount);
-            Private::ReadLittleEndian(stream, header.recordOffset);
-            Private::ReadLittleEndian<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, header.recordCompression);
-            Private::ReadLittleEndian(stream, header.recordSize);
-            Private::ReadLittleEndian<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, header.nameCompression);
-            Private::ReadLittleEndian(stream, header.nameSize);
-            Private::ReadLittleEndian(stream, header.rawNameSize);
+            Private::Read(stream, header.version);
+            Private::Read(stream, header.fileCount);
+            Private::Read(stream, header.recordOffset);
+            Private::Read<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, header.recordCompression);
+            Private::Read(stream, header.recordSize);
+            Private::Read<SWGEmuStructureBuilder::Tre::CompressionMethod, std::uint32_t>(stream, header.nameCompression);
+            Private::Read(stream, header.nameSize);
+            Private::Read(stream, header.rawNameSize);
 
             return header;
         }
